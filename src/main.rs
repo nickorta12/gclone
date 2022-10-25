@@ -36,13 +36,13 @@ fn main() -> eyre::Result<()> {
         {
             fs::remove_dir(&repo_dir)?;
         } else {
-            symlink(&repo_dir, &symlink_dir)?;
+            symlink(&repo_dir, &symlink_dir, cli.lang)?;
             return Ok(());
         }
     }
     fs::create_dir_all(&parent_dir)?;
     clone_repo(&location.url, &parent_dir, &repo_dir)?;
-    symlink(&repo_dir, &symlink_dir)?;
+    symlink(&repo_dir, &symlink_dir, cli.lang)?;
 
     Ok(())
 }
@@ -107,11 +107,11 @@ fn get_top_language(repo_dir: &Path) -> String {
     })
 }
 
-fn symlink(repo_dir: &Path, symlink_dir: &Path) -> eyre::Result<()> {
+fn symlink(repo_dir: &Path, symlink_dir: &Path, lang: Option<String>) -> eyre::Result<()> {
     if !symlink_dir.exists() {
         fs::create_dir(&symlink_dir)?;
     }
-    let lang = get_top_language(repo_dir);
+    let lang = lang.unwrap_or_else(|| get_top_language(repo_dir));
     let lang_dir = symlink_dir.join(lang);
     if !lang_dir.exists() {
         fs::create_dir(&lang_dir)?;

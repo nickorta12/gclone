@@ -44,6 +44,9 @@ impl From<TryUrl> for Url {
 pub struct Cli {
     #[clap(flatten)]
     pub verbose: Verbosity,
+    /// Override language to use
+    #[clap(short, long)]
+    pub lang: Option<String>,
     pub url: TryUrl,
 }
 
