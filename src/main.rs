@@ -36,13 +36,13 @@ fn main() -> eyre::Result<()> {
         {
             fs::remove_dir(&repo_dir)?;
         } else {
-            symlink(&repo_dir, &symlink_dir, cli.lang)?;
+            symlink(&repo_dir, &symlink_dir, cli.lang, cli.name)?;
             return Ok(());
         }
     }
     fs::create_dir_all(&parent_dir)?;
     clone_repo(&location.url, &parent_dir, &repo_dir)?;
-    symlink(&repo_dir, &symlink_dir, cli.lang)?;
+    symlink(&repo_dir, &symlink_dir, cli.lang, cli.name)?;
 
     Ok(())
 }
@@ -107,7 +107,12 @@ fn get_top_language(repo_dir: &Path) -> String {
     })
 }
 
-fn symlink(repo_dir: &Path, symlink_dir: &Path, lang: Option<String>) -> eyre::Result<()> {
+fn symlink(
+    repo_dir: &Path,
+    symlink_dir: &Path,
+    lang: Option<String>,
+    name: Option<String>,
+) -> eyre::Result<()> {
     if !symlink_dir.exists() {
         fs::create_dir(&symlink_dir)?;
     }
@@ -117,11 +122,15 @@ fn symlink(repo_dir: &Path, symlink_dir: &Path, lang: Option<String>) -> eyre::R
         fs::create_dir(&lang_dir)?;
     }
 
-    let dest_dir = lang_dir.join(
-        repo_dir
-            .file_name()
-            .ok_or(eyre::eyre!("unable to get file name of repo"))?,
-    );
+    let dest_dir = if let Some(name) = name {
+        lang_dir.join(name)
+    } else {
+        lang_dir.join(
+            repo_dir
+                .file_name()
+                .ok_or(eyre::eyre!("unable to get file name of repo"))?,
+        )
+    };
     if dest_dir.exists() {
         println!(
             "Repo {} already linked at {}",

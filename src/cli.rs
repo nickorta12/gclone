@@ -47,6 +47,9 @@ pub struct Cli {
     /// Override language to use
     #[clap(short, long)]
     pub lang: Option<String>,
+    /// Override name of folder in symlink dir
+    #[clap(short, long)]
+    pub name: Option<String>,
     pub url: TryUrl,
 }
 
