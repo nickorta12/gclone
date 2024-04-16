@@ -4,7 +4,7 @@ use clap::Parser;
 use clap_verbosity_flag::Verbosity;
 use url::Url;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TryUrl(Url);
 
 fn validate_fragment(frag: &str) -> bool {
