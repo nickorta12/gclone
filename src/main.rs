@@ -22,10 +22,16 @@ fn main() -> eyre::Result<()> {
     let location = RepoLocation::from_url(url)?;
     debug!("Location: {:?}", location);
 
-    let parent_dir = project_dirs
-        .cache_dir()
-        .join(location.host)
-        .join(location.parent);
+    let parent_dir = {
+        let mut parent_dir = project_dirs.cache_dir().join(location.host);
+
+        if let Some(parent) = location.parent {
+            parent_dir = parent_dir.join(parent);
+        }
+
+        parent_dir
+    };
+
     let repo_dir = parent_dir.join(location.repo);
     let symlink_dir = base_dirs.home_dir().join("repos");
     if repo_dir.exists() {
@@ -148,7 +154,6 @@ fn symlink(
 #[derive(Debug, Clone)]
 enum LocationPart {
     Parent,
-    Repo,
     InvalidHost,
 }
 
@@ -161,7 +166,6 @@ impl fmt::Display for LocationParsingError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self.0 {
             LocationPart::Parent => f.write_str("unable to parse parent portion of url"),
-            LocationPart::Repo => f.write_str("unable to parse repo portion of url"),
             LocationPart::InvalidHost => f.write_str("invalid hostname"),
         }
     }
@@ -172,10 +176,6 @@ impl LocationParsingError {
         Self(LocationPart::Parent)
     }
 
-    fn repo() -> Self {
-        Self(LocationPart::Repo)
-    }
-
     fn host() -> Self {
         Self(LocationPart::InvalidHost)
     }
@@ -184,7 +184,7 @@ impl LocationParsingError {
 #[derive(Debug)]
 struct RepoLocation {
     url: Url,
-    parent: String,
+    parent: Option<String>,
     repo: String,
     host: String,
 }
@@ -196,17 +196,20 @@ impl RepoLocation {
             .ok_or_else(LocationParsingError::parent)?;
 
         struct Partial {
-            parent: String,
+            parent: Option<String>,
             repo: String,
         }
 
         let partial = match segments.next() {
             Some(parent) => match segments.next() {
                 Some(repo) => Ok(Partial {
-                    parent: parent.to_owned(),
+                    parent: Some(parent.to_owned()),
                     repo: repo.to_owned(),
                 }),
-                None => Err(LocationParsingError::repo()),
+                None => Ok(Partial {
+                    parent: None,
+                    repo: parent.to_owned(),
+                }),
             },
             None => Err(LocationParsingError::parent()),
         }?;

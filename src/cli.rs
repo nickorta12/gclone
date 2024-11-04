@@ -51,6 +51,9 @@ pub struct Cli {
     #[clap(short, long)]
     pub name: Option<String>,
     pub url: TryUrl,
+    /// No auto generation of name and lang
+    #[clap(short, long)]
+    pub raw: bool,
 }
 
 pub fn args() -> Cli {
