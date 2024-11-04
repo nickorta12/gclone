@@ -1,6 +1,6 @@
 [package]
 name = "gclone"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 repository = "https://github.com/nickorta12/gclone"
 
@@ -18,22 +18,7 @@ log = "0.4.17"
 tokei = "12.1.2"
 url = { version = "2.3.1", default-features = false }
 
-# The profile that 'cargo dist' will build with
+# The profile that 'dist' will build with
 [profile.dist]
 inherits = "release"
 lto = "thin"
-
-# Config for 'cargo dist'
-[workspace.metadata.dist]
-# The preferred cargo-dist version to use in CI (Cargo.toml SemVer syntax)
-cargo-dist-version = "0.13.1"
-# CI backends to support
-ci = ["github"]
-# The installers to generate for each app
-installers = ["shell"]
-# Target platforms to build apps for (Rust target-triple syntax)
-targets = ["aarch64-apple-darwin", "x86_64-unknown-linux-gnu"]
-# Publish jobs to run in CI
-pr-run-mode = "plan"
-# Whether to install an updater program
-install-updater = false

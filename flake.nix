@@ -6,10 +6,10 @@
   };
 
   outputs = {
-    self,
     flake-utils,
     naersk,
     nixpkgs,
+    ...
   }:
     flake-utils.lib.eachDefaultSystem (
       system: let
@@ -18,7 +18,7 @@
         };
 
         naersk' = pkgs.callPackage naersk {};
-      in rec {
+      in {
         # For `nix build` & `nix run`:
         defaultPackage = naersk'.buildPackage {
           src = ./.;
@@ -29,7 +29,7 @@
 
         # For `nix develop`:
         devShell = pkgs.mkShell {
-          nativeBuildInputs = with pkgs; [rustc cargo];
+          nativeBuildInputs = with pkgs; [rustc cargo cargo-dist];
         };
       }
     );
