@@ -21,7 +21,7 @@ impl FromStr for TryUrl {
         match Url::parse(s) {
             Ok(url) => Ok(Self(url)),
             Err(_) if validate_fragment(s) => {
-                Url::parse(&format!("https://www.github.com/{}", s)).map(|x| x.into())
+                Url::parse(&format!("https://github.com/{}.git/", s)).map(|x| x.into())
             }
             Err(err) => Err(err),
         }

@@ -217,7 +217,7 @@ impl RepoLocation {
         match url.host() {
             Some(Host::Domain(host)) => Ok(Self {
                 parent: partial.parent,
-                repo: partial.repo,
+                repo: partial.repo.replace(".git", ""),
                 host: host.replace("www.", ""),
                 url,
             }),
